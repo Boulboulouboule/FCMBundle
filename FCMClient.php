@@ -142,4 +142,32 @@ class FCMClient
 
         return $this->client->send($message);
     }
+
+    /**
+     * @param DeviceNotification | TopicNotification $notification
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function sendSilentNotification($notification)
+    {
+        if (!$notification instanceof DeviceNotification && !$notification instanceof TopicNotification) {
+            throw new \InvalidArgumentException('Notification must be of type DeviceNotification or TopicNotification');
+        }
+
+        $message = (new Message())
+            ->setContentAvailable($notification->getContentAvailable())
+            ->setData($notification->getData())
+            ->setPriority($notification->getPriority());
+
+        // Check for the type of Notification
+        if ($notification instanceof DeviceNotification) {
+            foreach ($notification->getDeviceTokens() as $deviceToken) {
+                $message->addRecipient(new Device($deviceToken));
+            }
+        } else if ($notification instanceof TopicNotification) {
+            $message->addRecipient(new Topic($notification->getTopic()));
+        }
+
+        return $this->client->send($message);
+    }
 }
