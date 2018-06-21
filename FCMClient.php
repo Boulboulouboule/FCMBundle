@@ -48,7 +48,7 @@ class FCMClient
      * @param null | array $token
      * @return DeviceNotification
      */
-    public function createDeviceNotification($title = null, $body = null, $token = null)
+    public function createDeviceNotification($title = null, $body = null, $token = array())
     {
         $notification = new DeviceNotification();
         $notification
@@ -129,7 +129,10 @@ class FCMClient
         $message = (new Message())
             ->setNotification($notification)
             ->setData($notification->getData())
-            ->setPriority($notification->getPriority());
+            ->setPriority($notification->getPriority())
+            ->setJsonData($notification->getJsonData())
+            ->setContentAvailable($notification->getContentAvailable())
+            ->setCollapseKey($notification->getCollapseKey());
 
         // Check for the type of Notification
         if($notification instanceof DeviceNotification){
